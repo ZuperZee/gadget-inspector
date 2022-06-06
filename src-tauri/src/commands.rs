@@ -1,9 +1,9 @@
 use tokio_modbus::prelude::*;
 
 use crate::modbus_data_type_converters::{
-    sint16::vec_uint16_to_sint16, sint32::vec_uint32_to_sint32, sint64::vec_uint64_to_sint64,
-    sint8::vec_uint8_to_sint8, uint32::vec_uint8_to_uint32, uint64::vec_uint8_to_uint64,
-    uint8::vec_uint16_to_uint8,
+    float32::vec_uint8_to_float32, float64::vec_uint8_to_float64, sint16::vec_uint16_to_sint16,
+    sint32::vec_uint32_to_sint32, sint64::vec_uint64_to_sint64, sint8::vec_uint8_to_sint8,
+    uint32::vec_uint8_to_uint32, uint64::vec_uint8_to_uint64, uint8::vec_uint16_to_uint8,
 };
 
 #[derive(serde::Serialize)]
@@ -19,6 +19,9 @@ pub struct ModbusData {
     sint16: Vec<i16>,
     sint32: Vec<i32>,
     sint64: Vec<i64>,
+
+    float32: Vec<f32>,
+    float64: Vec<f64>,
 }
 
 #[tauri::command]
@@ -67,6 +70,9 @@ pub async fn read_modbus_command(
     let res_sint32 = vec_uint32_to_sint32(&res_uint32);
     let res_sint64 = vec_uint64_to_sint64(&res_uint64);
 
+    let res_float32 = vec_uint8_to_float32(&res_uint8);
+    let res_float64 = vec_uint8_to_float64(&res_uint8);
+
     ctx.disconnect().await.unwrap(); // Disconnect after reading values
 
     return Ok(ModbusData {
@@ -81,6 +87,9 @@ pub async fn read_modbus_command(
         sint16: res_sint16,
         sint32: res_sint32,
         sint64: res_sint64,
+
+        float32: res_float32,
+        float64: res_float64,
     });
 }
 

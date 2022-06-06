@@ -12,6 +12,9 @@ export interface ModbusData {
   sint16: number[];
   sint32: number[];
   sint64: number[];
+
+  float32: number[];
+  float64: number[];
 }
 
 export function ModbusData(props: { modbusData?: ModbusData }) {
@@ -83,12 +86,24 @@ export function ModbusData(props: { modbusData?: ModbusData }) {
         <For each={props.modbusData?.sint32}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
+        <div>Float32</div>
+        <For each={props.modbusData?.float32}>
+          {(data) => <div>{data}</div>}
+        </For>
+      </div>
+      <div>
         <div>Uint64</div>
         <For each={props.modbusData?.uint64}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
         <div>Sint64</div>
         <For each={props.modbusData?.sint64}>{(data) => <div>{data}</div>}</For>
+      </div>
+      <div>
+        <div>Float64</div>
+        <For each={props.modbusData?.float64}>
+          {(data) => <div>{data}</div>}
+        </For>
       </div>
     </div>
   );
