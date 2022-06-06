@@ -22,9 +22,9 @@ async function readModbus({
 
 const App: Component = () => {
   const [socketAddress, setSocketAddress] =
-    createSignal<string>("127.0.0.1:5502");
+    createSignal<string>("127.0.0.1:5503");
   const [address, setAddress] = createSignal(0);
-  const [quantity, setQuantity] = createSignal(0);
+  const [quantity, setQuantity] = createSignal(40);
   const [modbusData, setModbusData] = createSignal<ModbusData>();
 
   return (
@@ -32,19 +32,19 @@ const App: Component = () => {
       <Input
         type="text"
         placeholder="Socket address"
-        onInput={(e) => setSocketAddress(e.currentTarget.value)}
+        onChange={(e) => setSocketAddress(e.currentTarget.value)}
         value={socketAddress()}
       />
       <Input
         type="number"
         placeholder="Address"
-        onInput={(e) => setAddress(Number(e.currentTarget.value))}
+        onChange={(e) => setAddress(Number(e.currentTarget.value))}
         value={address()}
       />
       <Input
         type="number"
         placeholder="Quantity"
-        onInput={(e) => setQuantity(Number(e.currentTarget.value))}
+        onChange={(e) => setQuantity(Number(e.currentTarget.value))}
         value={quantity()}
       />
       <Button
