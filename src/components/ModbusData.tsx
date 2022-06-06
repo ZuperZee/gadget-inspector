@@ -1,4 +1,4 @@
-import { createEffect, For } from "solid-js";
+import { For } from "solid-js";
 
 export interface ModbusData {
   addresses: number[];
@@ -15,14 +15,23 @@ export interface ModbusData {
 }
 
 export function ModbusData(props: { modbusData?: ModbusData }) {
-  createEffect(() => {
-    console.log(props.modbusData);
-  });
   return (
     <div class="flex space-x-4">
       <div>
         <For each={props.modbusData?.addresses}>
           {(data) => <div>{data}</div>}
+        </For>
+      </div>
+      <div>
+        <For each={props.modbusData?.uint16}>
+          {(data) => {
+            const binaryString = data.toString(2).padStart(16, "0");
+            return (
+              <div class="whitespace-nowrap">
+                {binaryString.slice(0, 8)} {binaryString.slice(8)}
+              </div>
+            );
+          }}
         </For>
       </div>
       <div>
