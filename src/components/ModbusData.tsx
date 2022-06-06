@@ -18,11 +18,13 @@ export function ModbusData(props: { modbusData?: ModbusData }) {
   return (
     <div class="flex space-x-4">
       <div>
+        <div>Addr</div>
         <For each={props.modbusData?.addresses}>
           {(data) => <div>{data}</div>}
         </For>
       </div>
       <div>
+        <div>Binary</div>
         <For each={props.modbusData?.uint16}>
           {(data) => {
             const binaryString = data.toString(2).padStart(16, "0");
@@ -35,41 +37,57 @@ export function ModbusData(props: { modbusData?: ModbusData }) {
         </For>
       </div>
       <div>
-        <For each={props.modbusData?.uint8.filter((_, i) => i % 2 === 0)}>
-          {(data) => <div>{data}</div>}
-        </For>
+        <div>Uint8</div>
+        <div class="flex space-x-4">
+          <div>
+            <For each={props.modbusData?.uint8.filter((_, i) => i % 2 === 0)}>
+              {(data) => <div>{data}</div>}
+            </For>
+          </div>
+          <div>
+            <For each={props.modbusData?.uint8.filter((_, i) => i % 2 === 1)}>
+              {(data) => <div>{data}</div>}
+            </For>
+          </div>
+        </div>
       </div>
       <div>
-        <For each={props.modbusData?.uint8.filter((_, i) => i % 2 === 1)}>
-          {(data) => <div>{data}</div>}
-        </For>
+        <div>Sint8</div>
+        <div class="flex space-x-4">
+          <div>
+            <For each={props.modbusData?.sint8.filter((_, i) => i % 2 === 0)}>
+              {(data) => <div>{data}</div>}
+            </For>
+          </div>
+          <div>
+            <For each={props.modbusData?.sint8.filter((_, i) => i % 2 === 1)}>
+              {(data) => <div>{data}</div>}
+            </For>
+          </div>
+        </div>
       </div>
       <div>
-        <For each={props.modbusData?.sint8.filter((_, i) => i % 2 === 0)}>
-          {(data) => <div>{data}</div>}
-        </For>
-      </div>
-      <div>
-        <For each={props.modbusData?.sint8.filter((_, i) => i % 2 === 1)}>
-          {(data) => <div>{data}</div>}
-        </For>
-      </div>
-      <div>
+        <div>Uint16</div>
         <For each={props.modbusData?.uint16}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
+        <div>Sint16</div>
         <For each={props.modbusData?.sint16}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
+        <div>Uint32</div>
         <For each={props.modbusData?.uint32}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
+        <div>Sint32</div>
         <For each={props.modbusData?.sint32}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
+        <div>Uint64</div>
         <For each={props.modbusData?.uint64}>{(data) => <div>{data}</div>}</For>
       </div>
       <div>
+        <div>Sint64</div>
         <For each={props.modbusData?.sint64}>{(data) => <div>{data}</div>}</For>
       </div>
     </div>
