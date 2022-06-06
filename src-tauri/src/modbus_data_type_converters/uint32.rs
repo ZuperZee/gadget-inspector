@@ -19,14 +19,6 @@ mod tests {
     use crate::modbus_data_type_converters::uint32::vec_uint8_to_uint32;
 
     #[test]
-    fn t() {
-        assert_eq!(
-            vec_uint8_to_uint32(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-            vec![16909060, 50595078, 84281096]
-        );
-    }
-
-    #[test]
     fn vec_uint8_converts_to_uint32() {
         assert_eq!(vec_uint8_to_uint32(&vec![0, 0, 0, 0]), vec![0]); // Min
         assert_eq!(
