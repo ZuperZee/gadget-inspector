@@ -18,7 +18,7 @@ tauri-build = {version = "1.0.0-rc.12", features = [] }
 serde = {version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
 tauri = {version = "1.0.0-rc.14", features = ["api-all"] }
-tokio = {version = "1.19.0", features = ["full"] }
+tokio = {version = "1.19.2", features = ["full"] }
 tokio-modbus = {version = "0.5.2", features = ["tcp"] }
 
 [features]

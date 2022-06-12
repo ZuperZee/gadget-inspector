@@ -1,4 +1,4 @@
-import { ModbusData } from "@components/ModbusData";
+import { ModbusData, ModbusTable } from "@components/ModbusTable";
 import { Button } from "@components/ui/Button";
 import { Input } from "@components/ui/Input";
 import { invoke } from "@tauri-apps/api";
@@ -24,11 +24,11 @@ const App: Component = () => {
   const [socketAddress, setSocketAddress] =
     createSignal<string>("127.0.0.1:5503");
   const [address, setAddress] = createSignal(0);
-  const [quantity, setQuantity] = createSignal(40);
+  const [quantity, setQuantity] = createSignal(5);
   const [modbusData, setModbusData] = createSignal<ModbusData>();
 
   return (
-    <div>
+    <div class="flex h-screen flex-col">
       <Input
         type="text"
         placeholder="Socket address"
@@ -61,7 +61,7 @@ const App: Component = () => {
       >
         Read modbus
       </Button>
-      <ModbusData modbusData={modbusData()} />
+      <ModbusTable modbusData={modbusData()} />
     </div>
   );
 };

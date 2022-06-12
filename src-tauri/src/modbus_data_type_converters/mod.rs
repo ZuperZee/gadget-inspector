@@ -1,3 +1,4 @@
+pub mod ascii;
 pub mod float32;
 pub mod float64;
 pub mod sint16;
