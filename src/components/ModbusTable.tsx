@@ -63,7 +63,7 @@ export function ModbusTable(props: { modbusData?: ModbusData }) {
             <HeaderCell>Float64</HeaderCell>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="font-mono">
           <Index each={props.modbusData?.addresses}>
             {(_, i) => (
               <tr class="whitespace-nowrap odd:bg-white even:bg-neutral-100 [&:nth-child(4n+1)]:bg-neutral-200">

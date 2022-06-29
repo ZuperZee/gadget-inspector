@@ -1,3 +1,4 @@
+// Not used
 pub fn vec_uint8_to_uint16(u: &Vec<u8>) -> Vec<u16> {
     let u_len = u.len();
     let v_range = u_len - u_len % 2;

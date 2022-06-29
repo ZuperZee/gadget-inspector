@@ -27,11 +27,19 @@ pub struct ModbusData {
     ascii: Vec<char>,
 }
 
+#[derive(serde::Serialize)]
+pub struct ModbusBitData {
+    addresses: Vec<u16>,
+    bool: Vec<bool>,
+}
+
+// Reads holding and input registers
 #[tauri::command]
-pub async fn read_modbus_command(
+pub async fn read_modbus_address_command(
     socket_address: &str,
     address: u16,
     quantity: u16,
+    function: u8, // 3 or 4
 ) -> Result<ModbusData, String> {
     let socket_addr = socket_address.parse().unwrap();
 
@@ -50,15 +58,29 @@ pub async fn read_modbus_command(
         "Reading input register address: {} quantity: {}",
         address, quantity
     );
-    let res_uint16 = match ctx.read_input_registers(address, quantity).await {
-        Ok(r) => r,
-        Err(e) => {
-            ctx.disconnect().await.ok(); // Try to disconnect before returning error
-            println!("{}", e);
-            return Err(format!(
-                "Failed reading input address: {} quantity: {} with error: {:?}",
-                address, quantity, e,
-            ));
+    let res_uint16 = if function == 3 {
+        match ctx.read_input_registers(address, quantity).await {
+            Ok(r) => r,
+            Err(e) => {
+                ctx.disconnect().await.ok(); // Try to disconnect before returning error
+                println!("{}", e);
+                return Err(format!(
+                    "Failed reading input address: {} quantity: {} with error: {:?}",
+                    address, quantity, e,
+                ));
+            }
+        }
+    } else {
+        match ctx.read_holding_registers(address, quantity).await {
+            Ok(r) => r,
+            Err(e) => {
+                ctx.disconnect().await.ok(); // Try to disconnect before returning error
+                println!("{}", e);
+                return Err(format!(
+                    "Failed reading holding address: {} quantity: {} with error: {:?}",
+                    address, quantity, e,
+                ));
+            }
         }
     };
 
@@ -97,6 +119,59 @@ pub async fn read_modbus_command(
         float64: res_float64,
 
         ascii: res_ascii,
+    });
+}
+
+// Reads coil and discrete input registers
+#[tauri::command]
+pub async fn read_modbus_bit_address_command(
+    socket_address: &str,
+    address: u16,
+    quantity: u16,
+    function: u8, // 1 or 2
+) -> Result<ModbusBitData, String> {
+    let socket_addr = socket_address.parse().unwrap();
+
+    let mut ctx = match tcp::connect(socket_addr).await {
+        Ok(r) => r,
+        Err(e) => {
+            println!("{}", e);
+            return Err(format!(
+                "Failed connecting to socket address: {} with error: {:?}",
+                socket_addr, e
+            ));
+        }
+    };
+
+    println!(
+        "Reading input register address: {} quantity: {}",
+        address, quantity
+    );
+    let res_bool = match (if function == 1 {
+        ctx.read_coils(address, quantity)
+    } else {
+        ctx.read_discrete_inputs(address, quantity)
+    })
+    .await
+    {
+        Ok(r) => r,
+        Err(e) => {
+            ctx.disconnect().await.ok(); // Try to disconnect before returning error
+            println!("{}", e);
+            return Err(format!(
+                "Failed reading input address: {} quantity: {} with error: {:?}",
+                address, quantity, e,
+            ));
+        }
+    };
+
+    let addresses: Vec<u16> = (address..address + quantity).collect();
+
+    ctx.disconnect().await.unwrap(); // Disconnect after reading values
+
+    return Ok(ModbusBitData {
+        addresses: addresses,
+        bool: res_bool,
     });
 }
 
