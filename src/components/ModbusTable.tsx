@@ -41,7 +41,7 @@ function DataCell(props: JSX.TdHTMLAttributes<HTMLTableCellElement>) {
 export function ModbusTable(props: { modbusData?: ModbusData }) {
   return (
     <div class="grow overflow-x-auto shadow-sm">
-      <table class="w-full text-left">
+      <table class="text-left">
         <thead>
           <tr class="bg-neutral-100">
             <HeaderCell class="left-0 z-30">Addr</HeaderCell>
@@ -63,7 +63,7 @@ export function ModbusTable(props: { modbusData?: ModbusData }) {
             <HeaderCell>Float64</HeaderCell>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="font-mono">
           <Index each={props.modbusData?.addresses}>
             {(_, i) => (
               <tr class="whitespace-nowrap odd:bg-white even:bg-neutral-100 [&:nth-child(4n+1)]:bg-neutral-200">
