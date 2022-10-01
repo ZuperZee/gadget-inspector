@@ -41,7 +41,7 @@ function DataCell(props: JSX.TdHTMLAttributes<HTMLTableCellElement>) {
 export function ModbusTable(props: { modbusData?: ModbusData }) {
   return (
     <div class="grow overflow-x-auto shadow-sm">
-      <table class="w-full text-left">
+      <table class="text-left">
         <thead>
           <tr class="bg-neutral-100">
             <HeaderCell class="left-0 z-30">Addr</HeaderCell>

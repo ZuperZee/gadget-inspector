@@ -39,14 +39,13 @@ pub async fn read_modbus_address_command(
     socket_address: &str,
     address: u16,
     quantity: u16,
-    function: u8, // 3 or 4
+    function_code: u8, // 3 or 4
 ) -> Result<ModbusData, String> {
     let socket_addr = socket_address.parse().unwrap();
 
     let mut ctx = match tcp::connect(socket_addr).await {
         Ok(r) => r,
         Err(e) => {
-            println!("{}", e);
             return Err(format!(
                 "Failed connecting to socket address: {} with error: {:?}",
                 socket_addr, e
@@ -54,16 +53,22 @@ pub async fn read_modbus_address_command(
         }
     };
 
-    println!(
-        "Reading input register address: {} quantity: {}",
-        address, quantity
-    );
-    let res_uint16 = if function == 3 {
+    let res_uint16 = if function_code == 3 {
+        match ctx.read_holding_registers(address, quantity).await {
+            Ok(r) => r,
+            Err(e) => {
+                ctx.disconnect().await.ok(); // Try to disconnect before returning error
+                return Err(format!(
+                    "Failed reading holding address: {} quantity: {} with error: {:?}",
+                    address, quantity, e,
+                ));
+            }
+        }
+    } else if function_code == 4 {
         match ctx.read_input_registers(address, quantity).await {
             Ok(r) => r,
             Err(e) => {
                 ctx.disconnect().await.ok(); // Try to disconnect before returning error
-                println!("{}", e);
                 return Err(format!(
                     "Failed reading input address: {} quantity: {} with error: {:?}",
                     address, quantity, e,
@@ -71,17 +76,7 @@ pub async fn read_modbus_address_command(
             }
         }
     } else {
-        match ctx.read_holding_registers(address, quantity).await {
-            Ok(r) => r,
-            Err(e) => {
-                ctx.disconnect().await.ok(); // Try to disconnect before returning error
-                println!("{}", e);
-                return Err(format!(
-                    "Failed reading holding address: {} quantity: {} with error: {:?}",
-                    address, quantity, e,
-                ));
-            }
-        }
+        return Err(format!("Invalid function code: {}", function_code));
     };
 
     let addresses: Vec<u16> = (address..address + quantity).collect();
@@ -128,14 +123,13 @@ pub async fn read_modbus_bit_address_command(
     socket_address: &str,
     address: u16,
     quantity: u16,
-    function: u8, // 1 or 2
+    function_code: u8, // 1 or 2
 ) -> Result<ModbusBitData, String> {
     let socket_addr = socket_address.parse().unwrap();
 
     let mut ctx = match tcp::connect(socket_addr).await {
         Ok(r) => r,
         Err(e) => {
-            println!("{}", e);
             return Err(format!(
                 "Failed connecting to socket address: {} with error: {:?}",
                 socket_addr, e
@@ -143,26 +137,30 @@ pub async fn read_modbus_bit_address_command(
         }
     };
 
-    println!(
-        "Reading input register address: {} quantity: {}",
-        address, quantity
-    );
-    let res_bool = match (if function == 1 {
-        ctx.read_coils(address, quantity)
-    } else {
-        ctx.read_discrete_inputs(address, quantity)
-    })
-    .await
-    {
-        Ok(r) => r,
-        Err(e) => {
-            ctx.disconnect().await.ok(); // Try to disconnect before returning error
-            println!("{}", e);
-            return Err(format!(
-                "Failed reading input address: {} quantity: {} with error: {:?}",
-                address, quantity, e,
-            ));
+    let res_bool = if function_code == 1 {
+        match ctx.read_coils(address, quantity).await {
+            Ok(r) => r,
+            Err(e) => {
+                ctx.disconnect().await.ok(); // Try to disconnect before returning error
+                return Err(format!(
+                    "Failed reading coil address: {} quantity: {} with error: {:?}",
+                    address, quantity, e,
+                ));
+            }
         }
+    } else if function_code == 2 {
+        match ctx.read_discrete_inputs(address, quantity).await {
+            Ok(r) => r,
+            Err(e) => {
+                ctx.disconnect().await.ok(); // Try to disconnect before returning error
+                return Err(format!(
+                    "Failed reading discrete input address: {} quantity: {} with error: {:?}",
+                    address, quantity, e,
+                ));
+            }
+        }
+    } else {
+        return Err(format!("Invalid function code: {}", function_code));
     };
 
     let addresses: Vec<u16> = (address..address + quantity).collect();
@@ -184,7 +182,6 @@ pub async fn check_modbus_socket_address_command(socket_address: &str) -> Result
             return Ok(true);
         }
         Err(e) => {
-            println!("{}", e);
             return Err(format!(
                 "Failed connecting to socket address: {} with error: {:?}",
                 socket_addr, e
