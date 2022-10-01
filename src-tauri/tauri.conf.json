@@ -1,10 +1,11 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:3000",
-    "distDir": "../dist"
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": false
   },
   "package": {
     "productName": "gadget-inspector",
@@ -56,8 +57,10 @@
     "windows": [
       {
         "fullscreen": false,
+        "height": 600,
         "resizable": true,
-        "title": "Gadget inspector"
+        "title": "Gadget inspector",
+        "width": 800
       }
     ]
   }
