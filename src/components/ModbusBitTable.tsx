@@ -33,7 +33,7 @@ export function ModbusBitTable(props: { modbusData?: ModbusBitData }) {
           <tr class="bg-neutral-100">
             <HeaderCell class="left-0 z-30">Addr</HeaderCell>
 
-            <HeaderCell>Bool</HeaderCell>
+            <HeaderCell class="w-full">Bool</HeaderCell>
           </tr>
         </thead>
         <tbody class="font-mono">
@@ -44,7 +44,7 @@ export function ModbusBitTable(props: { modbusData?: ModbusBitData }) {
                   {props.modbusData?.addresses[i]}
                 </DataCell>
 
-                <DataCell class="w-full">
+                <DataCell>
                   {props.modbusData?.bool[i] ? "True" : "False"}
                 </DataCell>
               </tr>

@@ -60,7 +60,7 @@ export function ModbusTable(props: { modbusData?: ModbusData }) {
 
             <HeaderCell>Uint64</HeaderCell>
             <HeaderCell>Sint64</HeaderCell>
-            <HeaderCell>Float64</HeaderCell>
+            <HeaderCell class="w-full">Float64</HeaderCell>
           </tr>
         </thead>
         <tbody class="font-mono">
@@ -95,9 +95,7 @@ export function ModbusTable(props: { modbusData?: ModbusData }) {
 
                 <DataCell>{props.modbusData?.uint64[i]}</DataCell>
                 <DataCell>{props.modbusData?.sint64[i]}</DataCell>
-                <DataCell class="w-full">
-                  {props.modbusData?.float64[i]}
-                </DataCell>
+                <DataCell>{props.modbusData?.float64[i]}</DataCell>
               </tr>
             )}
           </Index>
