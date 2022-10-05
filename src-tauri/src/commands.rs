@@ -1,3 +1,5 @@
+use std::net::ToSocketAddrs;
+
 use tokio_modbus::prelude::*;
 
 use crate::modbus_data_type_converters::{
@@ -42,7 +44,22 @@ pub async fn read_modbus_address_command(
     quantity: u16,
     function_code: u8, // 3 or 4
 ) -> Result<ModbusData, String> {
-    let socket_addr = socket_address.parse().unwrap();
+    let mut socket_addr_iter = match socket_address.to_socket_addrs() {
+        Ok(r) => r,
+        Err(e) => {
+            return Err(format!(
+                "Failed parsing socket address: {} with error: {:?}",
+                socket_address, e
+            ));
+        }
+    };
+
+    let socket_addr = match socket_addr_iter.next() {
+        Some(r) => r,
+        None => {
+            return Err(format!("Couldn't find socket address: {}", socket_address));
+        }
+    };
 
     let mut ctx = match tcp::connect_slave(socket_addr, Slave(slave_id)).await {
         Ok(r) => r,
@@ -127,7 +144,22 @@ pub async fn read_modbus_bit_address_command(
     quantity: u16,
     function_code: u8, // 1 or 2
 ) -> Result<ModbusBitData, String> {
-    let socket_addr = socket_address.parse().unwrap();
+    let mut socket_addr_iter = match socket_address.to_socket_addrs() {
+        Ok(r) => r,
+        Err(e) => {
+            return Err(format!(
+                "Failed parsing socket address: {} with error: {:?}",
+                socket_address, e
+            ));
+        }
+    };
+
+    let socket_addr = match socket_addr_iter.next() {
+        Some(r) => r,
+        None => {
+            return Err(format!("Couldn't find socket address: {}", socket_address));
+        }
+    };
 
     let mut ctx = match tcp::connect_slave(socket_addr, Slave(slave_id)).await {
         Ok(r) => r,
