@@ -8,17 +8,20 @@ import { Component, createMemo, createSignal, Show } from "solid-js";
 
 async function readModbusAddress({
   socketAddress,
+  slaveId,
   address,
   quantity,
   functionCode,
 }: {
   socketAddress: string;
+  slaveId: number;
   address: number;
   quantity: number;
   functionCode: number;
 }) {
   return await invoke<ModbusData>("read_modbus_address_command", {
     socketAddress,
+    slaveId,
     address,
     quantity,
     functionCode,
@@ -27,17 +30,20 @@ async function readModbusAddress({
 
 async function readModbusBitAddress({
   socketAddress,
+  slaveId,
   address,
   quantity,
   functionCode,
 }: {
   socketAddress: string;
+  slaveId: number;
   address: number;
   quantity: number;
   functionCode: number;
 }) {
   return await invoke<ModbusBitData>("read_modbus_bit_address_command", {
     socketAddress,
+    slaveId,
     address,
     quantity,
     functionCode,
@@ -47,6 +53,7 @@ async function readModbusBitAddress({
 const App: Component = () => {
   const [socketAddress, setSocketAddress] =
     createSignal<string>("127.0.0.1:5503");
+  const [slaveId, setSlaveId] = createSignal(0);
   const [address, setAddress] = createSignal(0);
   const [functionCode, setFunctionCode] = createSignal(3);
   const [quantity, setQuantity] = createSignal(5);
@@ -65,6 +72,16 @@ const App: Component = () => {
         onChange={(e) => setSocketAddress(e.currentTarget.value)}
         value={socketAddress()}
         autocomplete="url"
+      />
+      <Input
+        id="slave-id"
+        labelText="Slave id"
+        type="number"
+        min={0}
+        max={255}
+        placeholder="Slave"
+        onChange={(e) => setSlaveId(e.currentTarget.valueAsNumber)}
+        value={slaveId()}
       />
       <Input
         id="address"
@@ -102,16 +119,17 @@ const App: Component = () => {
           if (isBit()) {
             const res = await readModbusBitAddress({
               socketAddress: socketAddress(),
+              slaveId: slaveId(),
               address: address(),
               quantity: quantity(),
               functionCode: functionCode(),
             });
 
-            console.log(res);
             setModbusBitData(res);
           } else {
             const res = await readModbusAddress({
               socketAddress: socketAddress(),
+              slaveId: slaveId(),
               address: address(),
               quantity: quantity(),
               functionCode: functionCode(),

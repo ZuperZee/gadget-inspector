@@ -37,13 +37,14 @@ pub struct ModbusBitData {
 #[tauri::command]
 pub async fn read_modbus_address_command(
     socket_address: &str,
+    slave_id: u8,
     address: u16,
     quantity: u16,
     function_code: u8, // 3 or 4
 ) -> Result<ModbusData, String> {
     let socket_addr = socket_address.parse().unwrap();
 
-    let mut ctx = match tcp::connect(socket_addr).await {
+    let mut ctx = match tcp::connect_slave(socket_addr, Slave(slave_id)).await {
         Ok(r) => r,
         Err(e) => {
             return Err(format!(
@@ -121,13 +122,14 @@ pub async fn read_modbus_address_command(
 #[tauri::command]
 pub async fn read_modbus_bit_address_command(
     socket_address: &str,
+    slave_id: u8,
     address: u16,
     quantity: u16,
     function_code: u8, // 1 or 2
 ) -> Result<ModbusBitData, String> {
     let socket_addr = socket_address.parse().unwrap();
 
-    let mut ctx = match tcp::connect(socket_addr).await {
+    let mut ctx = match tcp::connect_slave(socket_addr, Slave(slave_id)).await {
         Ok(r) => r,
         Err(e) => {
             return Err(format!(
