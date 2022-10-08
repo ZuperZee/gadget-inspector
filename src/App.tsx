@@ -63,84 +63,86 @@ const App: Component = () => {
   const isBit = createMemo(() => [1, 2].includes(functionCode()));
 
   return (
-    <div class="flex h-screen flex-col">
-      <Input
-        id="socket-address"
-        labelText="Socket address"
-        type="text"
-        placeholder="Socket address"
-        onChange={(e) => setSocketAddress(e.currentTarget.value)}
-        value={socketAddress()}
-        autocomplete="url"
-      />
-      <Input
-        id="slave-id"
-        labelText="Slave id"
-        type="number"
-        min={0}
-        max={255}
-        placeholder="Slave"
-        onChange={(e) => setSlaveId(e.currentTarget.valueAsNumber)}
-        value={slaveId()}
-      />
-      <Input
-        id="address"
-        type="number"
-        labelText="Modbus address"
-        placeholder="Address"
-        onChange={(e) => setAddress(Number(e.currentTarget.value))}
-        value={address()}
-      />
-      <Select
-        id="function-code"
-        labelText="Function code"
-        items={[
-          { value: 1, text: "(1) Coils" },
-          { value: 2, text: "(2) Discrete inputs" },
-          { value: 3, text: "(3) Holding registers" },
-          { value: 4, text: "(4) Input registers" },
-        ].map((a) =>
-          a.value === functionCode() ? { ...a, selected: true } : a
-        )}
-        onChange={(a) => {
-          setFunctionCode(Number(a.currentTarget.value));
-        }}
-      />
-      <Input
-        id="quantity"
-        type="number"
-        labelText="Quantity"
-        placeholder="Quantity"
-        onChange={(e) => setQuantity(Number(e.currentTarget.value))}
-        value={quantity()}
-      />
-      <Button
-        onClick={async () => {
-          if (isBit()) {
-            const res = await readModbusBitAddress({
-              socketAddress: socketAddress(),
-              slaveId: slaveId(),
-              address: address(),
-              quantity: quantity(),
-              functionCode: functionCode(),
-            });
+    <div>
+      <div class="max-w-xs">
+        <Input
+          id="socket-address"
+          labelText="Socket address"
+          type="text"
+          placeholder="Socket address"
+          onChange={(e) => setSocketAddress(e.currentTarget.value)}
+          value={socketAddress()}
+          autocomplete="url"
+        />
+        <Input
+          id="slave-id"
+          labelText="Slave id"
+          type="number"
+          min={0}
+          max={255}
+          placeholder="Slave"
+          onChange={(e) => setSlaveId(e.currentTarget.valueAsNumber)}
+          value={slaveId()}
+        />
+        <Input
+          id="address"
+          type="number"
+          labelText="Modbus address"
+          placeholder="Address"
+          onChange={(e) => setAddress(Number(e.currentTarget.value))}
+          value={address()}
+        />
+        <Select
+          id="function-code"
+          labelText="Function code"
+          items={[
+            { value: 1, text: "(1) Coils" },
+            { value: 2, text: "(2) Discrete inputs" },
+            { value: 3, text: "(3) Holding registers" },
+            { value: 4, text: "(4) Input registers" },
+          ].map((a) =>
+            a.value === functionCode() ? { ...a, selected: true } : a
+          )}
+          onChange={(a) => {
+            setFunctionCode(Number(a.currentTarget.value));
+          }}
+        />
+        <Input
+          id="quantity"
+          type="number"
+          labelText="Quantity"
+          placeholder="Quantity"
+          onChange={(e) => setQuantity(Number(e.currentTarget.value))}
+          value={quantity()}
+        />
+        <Button
+          onClick={async () => {
+            if (isBit()) {
+              const res = await readModbusBitAddress({
+                socketAddress: socketAddress(),
+                slaveId: slaveId(),
+                address: address(),
+                quantity: quantity(),
+                functionCode: functionCode(),
+              });
 
-            setModbusBitData(res);
-          } else {
-            const res = await readModbusAddress({
-              socketAddress: socketAddress(),
-              slaveId: slaveId(),
-              address: address(),
-              quantity: quantity(),
-              functionCode: functionCode(),
-            });
+              setModbusBitData(res);
+            } else {
+              const res = await readModbusAddress({
+                socketAddress: socketAddress(),
+                slaveId: slaveId(),
+                address: address(),
+                quantity: quantity(),
+                functionCode: functionCode(),
+              });
 
-            setModbusData(res);
-          }
-        }}
-      >
-        Read modbus
-      </Button>
+              setModbusData(res);
+            }
+          }}
+        >
+          Read modbus
+        </Button>
+      </div>
       <Show when={isBit()} fallback={<ModbusTable modbusData={modbusData()} />}>
         <ModbusBitTable modbusData={modbusBitData()} />
       </Show>
