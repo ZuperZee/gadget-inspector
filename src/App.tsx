@@ -1,10 +1,15 @@
 import { ModbusBitData, ModbusBitTable } from "@components/ModbusBitTable";
-import { ModbusData, ModbusTable } from "@components/ModbusTable";
+import { ModbusNumericalData, ModbusTable } from "@components/ModbusTable";
 import { Button } from "@components/ui/Button";
 import { Input } from "@components/ui/Input";
 import { Select } from "@components/ui/Select";
 import { invoke } from "@tauri-apps/api";
 import { Component, createMemo, createSignal, Show } from "solid-js";
+
+interface ModbusData {
+  ModbusNumericalData: ModbusNumericalData;
+  ModbusBitData: ModbusBitData;
+}
 
 async function readModbusAddress({
   socketAddress,
@@ -28,28 +33,6 @@ async function readModbusAddress({
   });
 }
 
-async function readModbusBitAddress({
-  socketAddress,
-  slaveId,
-  address,
-  quantity,
-  functionCode,
-}: {
-  socketAddress: string;
-  slaveId: number;
-  address: number;
-  quantity: number;
-  functionCode: number;
-}) {
-  return await invoke<ModbusBitData>("read_modbus_bit_address_command", {
-    socketAddress,
-    slaveId,
-    address,
-    quantity,
-    functionCode,
-  });
-}
-
 const App: Component = () => {
   const [socketAddress, setSocketAddress] =
     createSignal<string>("127.0.0.1:5503");
@@ -58,7 +41,6 @@ const App: Component = () => {
   const [functionCode, setFunctionCode] = createSignal(3);
   const [quantity, setQuantity] = createSignal(5);
   const [modbusData, setModbusData] = createSignal<ModbusData>();
-  const [modbusBitData, setModbusBitData] = createSignal<ModbusBitData>();
 
   const isBit = createMemo(() => [1, 2].includes(functionCode()));
 
@@ -117,34 +99,28 @@ const App: Component = () => {
         />
         <Button
           onClick={async () => {
-            if (isBit()) {
-              const res = await readModbusBitAddress({
-                socketAddress: socketAddress(),
-                slaveId: slaveId(),
-                address: address(),
-                quantity: quantity(),
-                functionCode: functionCode(),
-              });
+            const res = await readModbusAddress({
+              socketAddress: socketAddress(),
+              slaveId: slaveId(),
+              address: address(),
+              quantity: quantity(),
+              functionCode: functionCode(),
+            });
 
-              setModbusBitData(res);
-            } else {
-              const res = await readModbusAddress({
-                socketAddress: socketAddress(),
-                slaveId: slaveId(),
-                address: address(),
-                quantity: quantity(),
-                functionCode: functionCode(),
-              });
-
-              setModbusData(res);
-            }
+            console.log(res);
+            setModbusData(res);
           }}
         >
           Read modbus
         </Button>
       </div>
-      <Show when={isBit()} fallback={<ModbusTable modbusData={modbusData()} />}>
-        <ModbusBitTable modbusData={modbusBitData()} />
+      <Show
+        when={isBit()}
+        fallback={
+          <ModbusTable modbusData={modbusData()?.ModbusNumericalData} />
+        }
+      >
+        <ModbusBitTable modbusData={modbusData()?.ModbusBitData} />
       </Show>
     </div>
   );

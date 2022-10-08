@@ -1,7 +1,7 @@
 import { clsxm } from "@utils/clsxm";
 import { Index, JSX, splitProps } from "solid-js";
 
-export interface ModbusData {
+export interface ModbusNumericalData {
   addresses: number[];
 
   uint8: number[];
@@ -38,7 +38,7 @@ function DataCell(props: JSX.TdHTMLAttributes<HTMLTableCellElement>) {
   );
 }
 
-export function ModbusTable(props: { modbusData?: ModbusData }) {
+export function ModbusTable(props: { modbusData?: ModbusNumericalData }) {
   return (
     <div class="grow overflow-x-auto shadow-sm">
       <table class="text-left">
