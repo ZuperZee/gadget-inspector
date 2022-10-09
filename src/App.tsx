@@ -69,6 +69,8 @@ const App: Component = () => {
         <Input
           id="address"
           type="number"
+          min={0}
+          max={65_535}
           labelText="Modbus address"
           placeholder="Address"
           onChange={(e) => setAddress(Number(e.currentTarget.value))}
