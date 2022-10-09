@@ -24,7 +24,7 @@ pub fn vec_uint8_to_float64(u: &Vec<u8>) -> Vec<f64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::modbus_data_type_converters::float64::vec_uint8_to_float64;
+    use crate::modbus::modbus_data_type_converters::float64::vec_uint8_to_float64;
 
     #[test]
     fn vec_uint8_converts_to_float64() {

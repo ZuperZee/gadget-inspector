@@ -15,7 +15,7 @@ pub fn vec_uint8_to_float32(u: &Vec<u8>) -> Vec<f32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::modbus_data_type_converters::float32::vec_uint8_to_float32;
+    use crate::modbus::modbus_data_type_converters::float32::vec_uint8_to_float32;
 
     #[test]
     fn vec_uint8_converts_to_float32() {

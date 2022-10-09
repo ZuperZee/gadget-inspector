@@ -100,17 +100,19 @@ const App: Component = () => {
           value={quantity()}
         />
         <Button
-          onClick={async () => {
-            const res = await readModbusAddress({
+          onClick={() => {
+            readModbusAddress({
               socketAddress: socketAddress(),
               slaveId: slaveId(),
               address: address(),
               quantity: quantity(),
               functionCode: functionCode(),
-            });
-
-            console.log(res);
-            setModbusData(res);
+            })
+              .then((res) => setModbusData(res))
+              .catch((error) => {
+                console.error(error);
+                setModbusData();
+              });
           }}
         >
           Read modbus

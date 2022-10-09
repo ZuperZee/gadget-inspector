@@ -13,7 +13,7 @@ pub fn vec_uint8_to_uint16(u: &Vec<u8>) -> Vec<u16> {
 
 #[cfg(test)]
 mod tests {
-    use crate::modbus_data_type_converters::uint16::vec_uint8_to_uint16;
+    use crate::modbus::modbus_data_type_converters::uint16::vec_uint8_to_uint16;
 
     #[test]
     fn vec_uint8_converts_to_uint16() {

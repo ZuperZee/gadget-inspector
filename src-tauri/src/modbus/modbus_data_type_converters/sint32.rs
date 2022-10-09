@@ -5,7 +5,7 @@ pub fn vec_uint32_to_sint32(u: &Vec<u32>) -> Vec<i32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::modbus_data_type_converters::sint32::vec_uint32_to_sint32;
+    use crate::modbus::modbus_data_type_converters::sint32::vec_uint32_to_sint32;
 
     #[test]
     fn vec_uint32_converts_to_sint32() {

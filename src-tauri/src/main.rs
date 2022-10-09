@@ -4,7 +4,7 @@
 )]
 
 mod commands;
-mod modbus_data_type_converters;
+mod modbus;
 
 fn main() {
     tauri::Builder::default()

@@ -5,7 +5,7 @@ pub fn vec_uint8_to_sint8(u: &Vec<u8>) -> Vec<i8> {
 
 #[cfg(test)]
 mod tests {
-    use crate::modbus_data_type_converters::sint8::vec_uint8_to_sint8;
+    use crate::modbus::modbus_data_type_converters::sint8::vec_uint8_to_sint8;
 
     #[test]
     fn vec_uint8_converts_to_sint8() {

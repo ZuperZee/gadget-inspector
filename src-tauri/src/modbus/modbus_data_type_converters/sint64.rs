@@ -5,7 +5,7 @@ pub fn vec_uint64_to_sint64(u: &Vec<u64>) -> Vec<i64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::modbus_data_type_converters::sint64::vec_uint64_to_sint64;
+    use crate::modbus::modbus_data_type_converters::sint64::vec_uint64_to_sint64;
 
     #[test]
     fn vec_uint64_converts_to_sint64() {
