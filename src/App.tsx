@@ -46,7 +46,7 @@ const App: Component = () => {
 
   return (
     <div>
-      <div class="max-w-xs">
+      <div class="max-w-xs p-2">
         <Input
           id="socket-address"
           labelText="Socket address"
