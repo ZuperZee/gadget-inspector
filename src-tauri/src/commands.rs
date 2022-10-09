@@ -45,71 +45,38 @@ pub async fn read_modbus_address_command(
 
     let addresses: Vec<u16> = (address..address + quantity).collect();
 
-    if function_code == 1 {
-        match ctx.read_coils(address, quantity).await {
-            Ok(r) => {
-                ctx.disconnect().await.ok();
-                return Ok(create_modbus_bit_data(r, addresses));
-            }
-            Err(e) => {
-                ctx.disconnect().await.ok(); // Try to disconnect before returning error
-                return Err(format!(
-                    "Failed reading coil address: {} quantity: {} with error: {:?}",
-                    address, quantity, e,
-                ));
-            }
+    let res = match function_code {
+        1 => ctx
+            .read_coils(address, quantity)
+            .await
+            .map(|r| create_modbus_bit_data(r, addresses)),
+        2 => ctx
+            .read_discrete_inputs(address, quantity)
+            .await
+            .map(|r| create_modbus_bit_data(r, addresses)),
+        3 => ctx
+            .read_holding_registers(address, quantity)
+            .await
+            .map(|r| create_modbus_numerical_data(r, addresses)),
+        4 => ctx
+            .read_input_registers(address, quantity)
+            .await
+            .map(|r| create_modbus_numerical_data(r, addresses)),
+        _ => {
+            ctx.disconnect().await.ok(); // Try to disconnect before returning error
+            return Err(format!("Invalid function code: {}", function_code));
         }
-    }
+    };
 
-    if function_code == 2 {
-        match ctx.read_discrete_inputs(address, quantity).await {
-            Ok(r) => {
-                ctx.disconnect().await.ok();
-                return Ok(create_modbus_bit_data(r, addresses));
-            }
-            Err(e) => {
-                ctx.disconnect().await.ok(); // Try to disconnect before returning error
-                return Err(format!(
-                    "Failed reading discrete input address: {} quantity: {} with error: {:?}",
-                    address, quantity, e,
-                ));
-            }
-        }
-    }
+    ctx.disconnect().await.ok(); // Disconnect after reading
 
-    if function_code == 3 {
-        match ctx.read_holding_registers(address, quantity).await {
-            Ok(r) => {
-                ctx.disconnect().await.ok();
-                return Ok(create_modbus_numerical_data(r, addresses));
-            }
-            Err(e) => {
-                ctx.disconnect().await.ok(); // Try to disconnect before returning error
-                return Err(format!(
-                    "Failed reading holding address: {} quantity: {} with error: {:?}",
-                    address, quantity, e,
-                ));
-            }
-        }
+    match res {
+        Ok(r) => Ok(r),
+        Err(e) => Err(format!(
+            "Failed reading modbus address: {} quantity: {} with error: {:?}",
+            address, quantity, e,
+        )),
     }
-
-    if function_code == 4 {
-        match ctx.read_input_registers(address, quantity).await {
-            Ok(r) => {
-                ctx.disconnect().await.ok();
-                return Ok(create_modbus_numerical_data(r, addresses));
-            }
-            Err(e) => {
-                ctx.disconnect().await.ok(); // Try to disconnect before returning error
-                return Err(format!(
-                    "Failed reading input address: {} quantity: {} with error: {:?}",
-                    address, quantity, e,
-                ));
-            }
-        }
-    }
-
-    return Err(format!("Invalid function code: {}", function_code));
 }
 
 #[tauri::command]
