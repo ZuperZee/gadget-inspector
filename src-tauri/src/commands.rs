@@ -1,6 +1,9 @@
 use std::net::ToSocketAddrs;
 
-use tokio_modbus::prelude::*;
+use tokio_modbus::{
+    prelude::{tcp, Reader},
+    slave::Slave,
+};
 
 use crate::modbus_data_type_converters::{
     ascii::vec_uint8_to_ascii, float32::vec_uint8_to_float32, float64::vec_uint8_to_float64,
