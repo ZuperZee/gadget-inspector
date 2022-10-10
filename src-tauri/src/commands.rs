@@ -1,11 +1,14 @@
-use std::net::ToSocketAddrs;
+use std::{net::ToSocketAddrs, time::Duration};
 
+use tokio::time::timeout;
 use tokio_modbus::{
     prelude::{tcp, Reader},
     slave::Slave,
 };
 
 use crate::modbus::convert::{create_modbus_bit_data, create_modbus_numerical_data, ModbusData};
+
+const TIMEOUT_DURATION: Duration = Duration::from_millis(500);
 
 // Reads holding and input registers
 #[tauri::command]
@@ -33,13 +36,26 @@ pub async fn read_modbus_address_command(
         }
     };
 
-    let mut ctx = match tcp::connect_slave(socket_addr, Slave(slave_id)).await {
-        Ok(r) => r,
-        Err(e) => {
+    let mut ctx = match timeout(
+        TIMEOUT_DURATION,
+        tcp::connect_slave(socket_addr, Slave(slave_id)),
+    )
+    .await
+    {
+        Ok(o) => match o {
+            Ok(r) => r,
+            Err(e) => {
+                return Err(format!(
+                    "Failed connecting to socket address: {} with error: {:?}",
+                    socket_addr, e
+                ));
+            }
+        },
+        Err(_) => {
             return Err(format!(
-                "Failed connecting to socket address: {} with error: {:?}",
-                socket_addr, e
-            ));
+                "Timed out connecting to socket address: {} with slave id: {}",
+                socket_addr, slave_id,
+            ))
         }
     };
 
@@ -57,29 +73,64 @@ pub async fn read_modbus_address_command(
     let addresses: Vec<u16> = (address..address_to).collect();
 
     let res = match function_code {
-        1 => ctx
-            .read_coils(address, quantity)
-            .await
-            .map(|r| create_modbus_bit_data(r, addresses)),
-        2 => ctx
-            .read_discrete_inputs(address, quantity)
-            .await
-            .map(|r| create_modbus_bit_data(r, addresses)),
-        3 => ctx
-            .read_holding_registers(address, quantity)
-            .await
-            .map(|r| create_modbus_numerical_data(r, addresses)),
-        4 => ctx
-            .read_input_registers(address, quantity)
-            .await
-            .map(|r| create_modbus_numerical_data(r, addresses)),
+        1 => match timeout(TIMEOUT_DURATION, ctx.read_coils(address, quantity)).await {
+            Ok(o) => o.map(|r| create_modbus_bit_data(r, addresses)),
+            Err(_) => {
+                return Err(format!(
+                    "Timed out reading modbus address: {} quantity: {}",
+                    address, quantity,
+                ))
+            }
+        },
+        2 => match timeout(
+            TIMEOUT_DURATION,
+            ctx.read_discrete_inputs(address, quantity),
+        )
+        .await
+        {
+            Ok(o) => o.map(|r| create_modbus_bit_data(r, addresses)),
+            Err(_) => {
+                return Err(format!(
+                    "Timed out reading modbus address: {} quantity: {}",
+                    address, quantity,
+                ))
+            }
+        },
+        3 => match timeout(
+            TIMEOUT_DURATION,
+            ctx.read_holding_registers(address, quantity),
+        )
+        .await
+        {
+            Ok(o) => o.map(|r| create_modbus_numerical_data(r, addresses)),
+            Err(_) => {
+                return Err(format!(
+                    "Timed out reading modbus address: {} quantity: {}",
+                    address, quantity,
+                ))
+            }
+        },
+        4 => match timeout(
+            TIMEOUT_DURATION,
+            ctx.read_input_registers(address, quantity),
+        )
+        .await
+        {
+            Ok(o) => o.map(|r| create_modbus_numerical_data(r, addresses)),
+            Err(_) => {
+                return Err(format!(
+                    "Timed out reading modbus address: {} quantity: {}",
+                    address, quantity,
+                ))
+            }
+        },
         _ => {
-            ctx.disconnect().await.ok(); // Try to disconnect before returning error
+            timeout(TIMEOUT_DURATION, ctx.disconnect()).await.ok(); // Try to disconnect before returning error
             return Err(format!("Invalid function code: {}", function_code));
         }
     };
 
-    ctx.disconnect().await.ok(); // Disconnect after reading
+    timeout(TIMEOUT_DURATION, ctx.disconnect()).await.ok();
 
     match res {
         Ok(r) => Ok(r),
