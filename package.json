@@ -1,6 +1,5 @@
 {
   "name": "gadget-inspector",
-  "version": "0.1.0",
   "description": "",
   "scripts": {
     "start": "vite",
