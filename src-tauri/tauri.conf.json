@@ -57,10 +57,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 800,
         "resizable": true,
         "title": "Gadget inspector",
-        "width": 800
+        "width": 1000
       }
     ]
   }
