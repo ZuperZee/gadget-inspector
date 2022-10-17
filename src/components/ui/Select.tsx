@@ -33,7 +33,10 @@ export function Select(props: Props) {
         <select
           {...rest}
           id={p.id}
-          class={clsxm("w-full bg-white p-1 focus:outline-none", p.class)}
+          class={clsxm(
+            "w-full appearance-none bg-white p-1 focus:outline-none",
+            p.class
+          )}
         >
           <For each={p.items}>
             {(a) => (
