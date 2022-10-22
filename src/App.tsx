@@ -5,6 +5,7 @@ import { Input } from "@components/ui/Input";
 import { Select } from "@components/ui/Select";
 import { invoke } from "@tauri-apps/api";
 import { Component, createMemo, createSignal, Show } from "solid-js";
+import { createStore } from "solid-js/store";
 
 interface ModbusData {
   ModbusNumericalData: ModbusNumericalData;
@@ -40,7 +41,11 @@ const App: Component = () => {
   const [address, setAddress] = createSignal(0);
   const [functionCode, setFunctionCode] = createSignal(3);
   const [quantity, setQuantity] = createSignal(5);
-  const [modbusData, setModbusData] = createSignal<ModbusData>();
+  const [modbusState, setModbusState] = createStore<{
+    isLoading: boolean;
+    errorMessage?: string;
+    modbusData?: ModbusData;
+  }>({ isLoading: false, errorMessage: undefined, modbusData: undefined });
 
   const isBit = createMemo(() => [1, 2].includes(functionCode()));
 
@@ -101,6 +106,7 @@ const App: Component = () => {
         />
         <Button
           onClick={() => {
+            setModbusState({ isLoading: true });
             readModbusAddress({
               socketAddress: socketAddress(),
               slaveId: slaveId(),
@@ -108,23 +114,41 @@ const App: Component = () => {
               quantity: quantity(),
               functionCode: functionCode(),
             })
-              .then((res) => setModbusData(res))
+              .then((res) =>
+                setModbusState({
+                  isLoading: false,
+                  errorMessage: undefined,
+                  modbusData: res,
+                })
+              )
               .catch((error) => {
                 console.error(error);
-                setModbusData();
+                setModbusState({
+                  isLoading: false,
+                  errorMessage: error,
+                  modbusData: undefined,
+                });
               });
           }}
+          disabled={modbusState.isLoading}
         >
-          Read modbus
+          <Show when={!modbusState.isLoading} fallback="Loading...">
+            Read modbus
+          </Show>
         </Button>
       </div>
+      <Show when={modbusState.errorMessage} keyed>
+        {(err) => <div class="my-2 ml-2 text-red-500">{err}</div>}
+      </Show>
       <Show
         when={isBit()}
         fallback={
-          <ModbusTable modbusData={modbusData()?.ModbusNumericalData} />
+          <ModbusTable
+            modbusData={modbusState.modbusData?.ModbusNumericalData}
+          />
         }
       >
-        <ModbusBitTable modbusData={modbusData()?.ModbusBitData} />
+        <ModbusBitTable modbusData={modbusState.modbusData?.ModbusBitData} />
       </Show>
     </div>
   );
