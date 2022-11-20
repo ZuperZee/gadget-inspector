@@ -18,6 +18,8 @@ pub async fn read_modbus_address_command(
     address: u16,
     quantity: u16,
     function_code: u8,
+    is_byte_swap: bool,
+    is_word_swap: bool,
 ) -> Result<ModbusData, String> {
     let mut socket_addr_iter = match socket_address.to_socket_addrs() {
         Ok(r) => r,
@@ -102,7 +104,9 @@ pub async fn read_modbus_address_command(
         )
         .await
         {
-            Ok(o) => o.map(|r| create_modbus_numerical_data(r, addresses)),
+            Ok(o) => {
+                o.map(|r| create_modbus_numerical_data(r, addresses, is_byte_swap, is_word_swap))
+            }
             Err(_) => {
                 return Err(format!(
                     "Timed out reading modbus address: {} quantity: {}",
@@ -116,7 +120,9 @@ pub async fn read_modbus_address_command(
         )
         .await
         {
-            Ok(o) => o.map(|r| create_modbus_numerical_data(r, addresses)),
+            Ok(o) => {
+                o.map(|r| create_modbus_numerical_data(r, addresses, is_byte_swap, is_word_swap))
+            }
             Err(_) => {
                 return Err(format!(
                     "Timed out reading modbus address: {} quantity: {}",

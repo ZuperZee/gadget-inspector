@@ -13,6 +13,21 @@ pub fn vec_uint8_to_float32(u: &Vec<u8>) -> Vec<f32> {
     return vec;
 }
 
+pub fn vec_uint8_to_float32_swapped(u: &Vec<u8>) -> Vec<f32> {
+    let u_len = u.len();
+    let v_range = u_len - u_len % 2;
+
+    let mut vec = Vec::new();
+    let mut i = 0;
+    // Needs 4 elements in the range to create a f32 (+2 makes sure it's always 4 elements)
+    while i + 2 < v_range {
+        vec.push(f32::from_be_bytes([u[i + 2], u[i + 3], u[i], u[i + 1]]));
+        i += 2;
+    }
+
+    return vec;
+}
+
 #[cfg(test)]
 mod tests {
     use crate::modbus::modbus_data_type_converters::float32::vec_uint8_to_float32;

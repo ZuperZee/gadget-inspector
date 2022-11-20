@@ -23,6 +23,30 @@ pub fn vec_uint8_to_uint64(u: &Vec<u8>) -> Vec<u64> {
     return vec;
 }
 
+pub fn vec_uint8_to_uint64_swapped(u: &Vec<u8>) -> Vec<u64> {
+    let u_len = u.len();
+    let v_range = u_len - u_len % 2;
+
+    let mut vec = Vec::new();
+    let mut i = 0;
+    // Needs 8 elements in the range to create a u64 (+6 makes sure it's always 8 elements)
+    while i + 6 < v_range {
+        vec.push(u64::from_be_bytes([
+            u[i + 2],
+            u[i + 3],
+            u[i],
+            u[i + 1],
+            u[i + 6],
+            u[i + 7],
+            u[i + 4],
+            u[i + 5],
+        ]));
+        i += 2;
+    }
+
+    return vec;
+}
+
 #[cfg(test)]
 mod tests {
     use crate::modbus::modbus_data_type_converters::uint64::vec_uint8_to_uint64;
