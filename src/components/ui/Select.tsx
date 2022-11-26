@@ -1,4 +1,4 @@
-import { clsxm } from "@utils/clsxm";
+import clsx from "clsx";
 import { For, JSX, Show, splitProps } from "solid-js";
 
 interface SelectItem {
@@ -33,7 +33,7 @@ export function Select(props: Props) {
         <select
           {...rest}
           id={p.id}
-          class={clsxm(
+          class={clsx(
             "w-full appearance-none bg-white p-1 focus:outline-none",
             p.class
           )}

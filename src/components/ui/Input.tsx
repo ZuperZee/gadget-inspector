@@ -1,4 +1,4 @@
-import { clsxm } from "@utils/clsxm";
+import clsx from "clsx";
 import { JSX, Show, splitProps } from "solid-js";
 
 export function Input(
@@ -24,7 +24,7 @@ export function Input(
         <input
           {...rest}
           id={p.id}
-          class={clsxm("w-full bg-white p-1 focus:outline-none", p.class)}
+          class={clsx("w-full bg-white p-1 focus:outline-none", p.class)}
         />
       </div>
     </div>

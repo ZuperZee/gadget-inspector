@@ -1,4 +1,4 @@
-import { clsxm } from "@utils/clsxm";
+import clsx from "clsx";
 import { Index, JSX, splitProps } from "solid-js";
 
 export interface ModbusNumericalData {
@@ -23,7 +23,7 @@ export interface ModbusNumericalData {
 function HeaderCell(props: JSX.ThHTMLAttributes<HTMLTableCellElement>) {
   const [p, rest] = splitProps(props, ["class"]);
   return (
-    <th {...rest} class={clsxm("sticky top-0 z-20 bg-inherit p-2", p.class)}>
+    <th {...rest} class={clsx("sticky top-0 z-20 bg-inherit p-2", p.class)}>
       {props.children}
     </th>
   );
@@ -32,7 +32,7 @@ function HeaderCell(props: JSX.ThHTMLAttributes<HTMLTableCellElement>) {
 function DataCell(props: JSX.TdHTMLAttributes<HTMLTableCellElement>) {
   const [p, rest] = splitProps(props, ["class"]);
   return (
-    <td {...rest} class={clsxm("px-2", p.class)}>
+    <td {...rest} class={clsx("px-2", p.class)}>
       {props.children}
     </td>
   );
