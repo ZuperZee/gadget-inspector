@@ -9,19 +9,19 @@ mod tests {
 
     #[test]
     fn vec_uint32_converts_to_sint32() {
-        assert_eq!(vec_uint32_to_sint32(&vec![0]), vec![0]); // Min
-        assert_eq!(vec_uint32_to_sint32(&vec![65535]), vec![-1]); // Max
-        assert_eq!(vec_uint32_to_sint32(&vec![32767]), vec![32767]); // Max positive
-        assert_eq!(vec_uint32_to_sint32(&vec![32768]), vec![-32768]); // Max negative
+        assert_eq!(vec_uint32_to_sint32(&vec![u32::MIN]), vec![0]); // Min input
+        assert_eq!(vec_uint32_to_sint32(&vec![u32::MAX]), vec![-1]); // Max input
+        assert_eq!(vec_uint32_to_sint32(&vec![0x7fff_ffff]), vec![i32::MAX]); // Max positive output
+        assert_eq!(vec_uint32_to_sint32(&vec![0x8000_0000]), vec![i32::MIN]); // Max negative output
 
         // Single
-        assert_eq!(vec_uint32_to_sint32(&vec![100]), vec![100]);
-        assert_eq!(vec_uint32_to_sint32(&vec![50000]), vec![-15536]);
+        assert_eq!(vec_uint32_to_sint32(&vec![0xff]), vec![255]);
+        assert_eq!(vec_uint32_to_sint32(&vec![0xffff_ff00]), vec![-256]);
 
         // Multiple
         assert_eq!(
-            vec_uint32_to_sint32(&vec![50, 53000, 900, 62000, 36000]),
-            vec![50, -12536, 900, -3536, -29536]
+            vec_uint32_to_sint32(&vec![0x32, 0xffff_cf08, 0x384]),
+            vec![50, -12536, 900]
         );
     }
 }
