@@ -7,7 +7,7 @@ mod tests {
     use super::vec_uint8_to_ascii;
 
     #[test]
-    fn vec_uint8_converts_to_sint8() {
+    fn vec_uint8_converts_to_ascii() {
         assert_eq!(vec_uint8_to_ascii(&[32]), vec![' ']); // Space
         assert_eq!(vec_uint8_to_ascii(&[10]), vec!['\n']); // LF (Line Feed, end of line)
         assert_eq!(vec_uint8_to_ascii(&[65]), vec!['A']);
