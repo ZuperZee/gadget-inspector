@@ -61,17 +61,17 @@ pub async fn read_modbus_address_command(
         }
     };
 
-    let address_to_u32 = u32::from(address) + u32::from(quantity);
-    if address_to_u32 > u16::MAX.into() {
-        return Err(format!(
-            "Max address is {}, but got {} (address + quantity)",
-            u16::MAX,
-            address_to_u32
-        ));
-    }
-
-    let address_to: u16 = address_to_u32.try_into().unwrap_or(u16::MAX); // Read to max address if it fails to cast
-
+    let address_to = match address.checked_add(quantity) {
+        Some(v) => v,
+        None => {
+            return Err(format!(
+                "Address {} + quantity {} is more than max address {}",
+                address,
+                quantity,
+                u16::MAX,
+            ))
+        }
+    };
     let addresses: Vec<u16> = (address..address_to).collect();
 
     let res = match function_code {
