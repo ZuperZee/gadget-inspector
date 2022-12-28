@@ -28,16 +28,6 @@ pub fn vec_uint8_to_uint64(u: &[u8], is_word_swap: bool) -> Vec<u64> {
                 u[i + 5],
             ])),
         }
-        vec.push(u64::from_be_bytes([
-            u[i],
-            u[i + 1],
-            u[i + 2],
-            u[i + 3],
-            u[i + 4],
-            u[i + 5],
-            u[i + 6],
-            u[i + 7],
-        ]));
         i += 2;
     }
 
@@ -49,7 +39,7 @@ mod tests {
     use crate::modbus::modbus_data_type_converters::uint64::vec_uint8_to_uint64;
 
     #[test]
-    fn vec_uint8_converts_to_uint32() {
+    fn vec_uint8_converts_to_uint64() {
         assert_eq!(
             vec_uint8_to_uint64(&[0, 0, 0, 0, 0, 0, 0, 0], false),
             vec![0]
