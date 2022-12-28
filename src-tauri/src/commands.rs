@@ -153,13 +153,11 @@ pub async fn check_modbus_socket_address_command(socket_address: &str) -> Result
     match tcp::connect(socket_addr).await {
         Ok(mut ctx) => {
             ctx.disconnect().await.ok(); // Try Disconnecting before returning
-            return Ok(true);
+            Ok(true)
         }
-        Err(e) => {
-            return Err(format!(
-                "Failed connecting to socket address: {} with error: {:?}",
-                socket_addr, e
-            ));
-        }
-    };
+        Err(e) => Err(format!(
+            "Failed connecting to socket address: {} with error: {:?}",
+            socket_addr, e
+        )),
+    }
 }
