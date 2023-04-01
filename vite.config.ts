@@ -2,10 +2,11 @@ import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [solidPlugin(), tsconfigPaths()],
 
-  // Vite optons tailored for Tauri development and only applied in `tauri dev` or `tauri build`
+  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors
   clearScreen: false,
   // tauri expects a fixed port, fail if that port is not available
@@ -20,7 +21,7 @@ export default defineConfig({
     // Tauri supports es2021
     target: ["es2021", "chrome100", "safari13"],
     // don't minify for debug builds
-    minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
+    minify: process.env.TAURI_DEBUG ? false : "esbuild",
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_DEBUG,
   },
