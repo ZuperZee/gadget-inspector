@@ -1,12 +1,12 @@
 [package]
 authors = ["ZuperZee"]
-default-run = "app"
-description = "A Tauri App"
+default-run = "gadget-inspector"
+description = "Gadget inspector"
 edition = "2021"
 license = ""
-name = "app"
+name = "gadget-inspector"
 repository = ""
-rust-version = "1.64"
+rust-version = "1.68"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
