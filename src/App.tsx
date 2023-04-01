@@ -57,6 +57,34 @@ const App: Component = () => {
 
   const isBit = createMemo(() => [1, 2].includes(functionCode()));
 
+  const readModbus = () => {
+    setModbusState({ isLoading: true });
+    readModbusAddress({
+      socketAddress: socketAddress(),
+      slaveId: slaveId(),
+      address: address(),
+      quantity: quantity(),
+      functionCode: functionCode(),
+      isByteSwap: isByteSwap(),
+      isWordSwap: isWordSwap(),
+    })
+      .then((res) =>
+        setModbusState({
+          isLoading: false,
+          errorMessage: undefined,
+          modbusData: res,
+        })
+      )
+      .catch((error) => {
+        console.error(error);
+        setModbusState({
+          isLoading: false,
+          errorMessage: error,
+          modbusData: undefined,
+        });
+      });
+  };
+
   return (
     <div>
       <div class="max-w-xs p-2">
@@ -132,36 +160,7 @@ const App: Component = () => {
           <div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300" />
           <span class="ml-3 text-sm font-medium text-gray-900">Word swap</span>
         </label>
-        <Button
-          onClick={() => {
-            setModbusState({ isLoading: true });
-            readModbusAddress({
-              socketAddress: socketAddress(),
-              slaveId: slaveId(),
-              address: address(),
-              quantity: quantity(),
-              functionCode: functionCode(),
-              isByteSwap: isByteSwap(),
-              isWordSwap: isWordSwap(),
-            })
-              .then((res) =>
-                setModbusState({
-                  isLoading: false,
-                  errorMessage: undefined,
-                  modbusData: res,
-                })
-              )
-              .catch((error) => {
-                console.error(error);
-                setModbusState({
-                  isLoading: false,
-                  errorMessage: error,
-                  modbusData: undefined,
-                });
-              });
-          }}
-          disabled={modbusState.isLoading}
-        >
+        <Button onClick={readModbus} disabled={modbusState.isLoading}>
           <Show when={!modbusState.isLoading} fallback="Loading...">
             Read modbus
           </Show>
