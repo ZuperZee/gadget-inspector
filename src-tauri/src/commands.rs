@@ -1,4 +1,4 @@
-use std::{net::ToSocketAddrs, time::Duration};
+use std::{net::SocketAddr, time::Duration};
 
 use tokio::time::timeout;
 use tokio_modbus::{
@@ -21,57 +21,39 @@ pub async fn read_modbus_address_command(
     is_byte_swap: bool,
     is_word_swap: bool,
 ) -> Result<ModbusData, String> {
-    let mut socket_addr_iter = match socket_address.to_socket_addrs() {
-        Ok(r) => r,
-        Err(e) => {
-            return Err(format!(
-                "Failed parsing socket address: {} with error: {:?}",
-                socket_address, e
-            ));
-        }
-    };
+    let socket_addr: SocketAddr = socket_address.parse().map_err(|err| {
+        format!(
+            "Couldn't parse socket address: {} with error: {}",
+            socket_address, err
+        )
+    })?;
 
-    let socket_addr = match socket_addr_iter.next() {
-        Some(r) => r,
-        None => {
-            return Err(format!("Couldn't find socket address: {}", socket_address));
-        }
-    };
-
-    let mut ctx = match timeout(
+    let mut ctx = timeout(
         TIMEOUT_DURATION,
         tcp::connect_slave(socket_addr, Slave(slave_id)),
     )
     .await
-    {
-        Ok(o) => match o {
-            Ok(r) => r,
-            Err(e) => {
-                return Err(format!(
-                    "Failed connecting to socket address: {} with error: {:?}",
-                    socket_addr, e
-                ));
-            }
-        },
-        Err(_) => {
-            return Err(format!(
-                "Timed out connecting to socket address: {} with slave id: {}",
-                socket_addr, slave_id,
-            ))
-        }
-    };
+    .map_err(|_| {
+        format!(
+            "Timed out connecting to socket address: {} with slave id: {}",
+            socket_addr, slave_id,
+        )
+    })?
+    .map_err(|err| {
+        format!(
+            "Failed connecting to socket address: {} with error: {:?}",
+            socket_addr, err
+        )
+    })?;
 
-    let address_to = match address.checked_add(quantity) {
-        Some(v) => v,
-        None => {
-            return Err(format!(
-                "Address {} + quantity {} is more than max address {}",
-                address,
-                quantity,
-                u16::MAX,
-            ))
-        }
-    };
+    let address_to = address.checked_add(quantity).ok_or_else(|| {
+        format!(
+            "Address {} + quantity {} is more than max address {}",
+            address,
+            quantity,
+            u16::MAX,
+        )
+    })?;
     let addresses: Vec<u16> = (address..address_to).collect();
 
     let res = match function_code {
@@ -138,13 +120,12 @@ pub async fn read_modbus_address_command(
 
     timeout(TIMEOUT_DURATION, ctx.disconnect()).await.ok();
 
-    match res {
-        Ok(r) => Ok(r),
-        Err(e) => Err(format!(
+    res.map_err(|e| {
+        format!(
             "Failed reading modbus address: {} quantity: {} with error: {:?}",
             address, quantity, e,
-        )),
-    }
+        )
+    })
 }
 
 #[tauri::command]

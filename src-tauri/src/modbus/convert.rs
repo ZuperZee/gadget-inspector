@@ -6,6 +6,7 @@ use super::modbus_data_type_converters::{
 };
 
 #[derive(serde::Serialize)]
+#[allow(clippy::large_enum_variant)]
 pub enum ModbusData {
     ModbusNumericalData {
         addresses: Vec<u16>,
