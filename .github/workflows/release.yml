@@ -7,11 +7,14 @@ on:
 
 jobs:
   release:
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -20,36 +23,36 @@ jobs:
         with:
           version: 7.12.2
 
-      - name: Node.js setup
+      - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: "pnpm"
-
-      - name: Rust setup
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
+        # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: Install web dependencies
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+
+      - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build web
-        run: pnpm run build
-
-      - name: Build app
+      - name: Build the app
         uses: tauri-apps/tauri-action@v0
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__ # tauri-action replaces \_\_VERSION\_\_ with the app version
-          releaseName: "v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
+          tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
+          releaseName: "v__VERSION__" # tauri-action replaces \_\_VERSION\_\_ with the app version.
+          releaseBody: "See the assets to download and install this version."
           releaseDraft: true
+          prerelease: false

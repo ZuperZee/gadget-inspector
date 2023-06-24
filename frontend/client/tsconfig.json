@@ -14,9 +14,9 @@
     "noEmit": true,
     "isolatedModules": true,
     "paths": {
-      "@assets/*": ["src/assets/*"],
-      "@components/*": ["src/components/*"],
-      "@utils/*": ["src/utils/*"]
+      "@assets/*": ["./src/assets/*"],
+      "@components/*": ["./src/components/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   }
 }

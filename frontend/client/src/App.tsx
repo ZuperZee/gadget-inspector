@@ -1,44 +1,11 @@
-import { ModbusBitData, ModbusBitTable } from "@components/ModbusBitTable";
-import { ModbusNumericalData, ModbusTable } from "@components/ModbusTable";
+import { ModbusBitTable } from "@components/ModbusBitTable";
+import { ModbusTable } from "@components/ModbusTable";
 import { Button } from "@components/ui/Button";
 import { Input } from "@components/ui/Input";
 import { Select } from "@components/ui/Select";
-import { invoke } from "@tauri-apps/api";
 import { Component, createMemo, createSignal, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-
-interface ModbusData {
-  ModbusNumericalData: ModbusNumericalData;
-  ModbusBitData: ModbusBitData;
-}
-
-async function readModbusAddress({
-  socketAddress,
-  slaveId,
-  address,
-  quantity,
-  functionCode,
-  isByteSwap,
-  isWordSwap,
-}: {
-  socketAddress: string;
-  slaveId: number;
-  address: number;
-  quantity: number;
-  functionCode: number;
-  isByteSwap: boolean;
-  isWordSwap: boolean;
-}) {
-  return await invoke<ModbusData>("read_modbus_address_command", {
-    socketAddress,
-    slaveId,
-    address,
-    quantity,
-    functionCode,
-    isByteSwap,
-    isWordSwap,
-  });
-}
+import { ModbusData, readModbusAddress } from "./api";
 
 const App: Component = () => {
   const [socketAddress, setSocketAddress] =
