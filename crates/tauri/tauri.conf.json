@@ -1,9 +1,9 @@
 {
   "build": {
-    "beforeDevCommand": "pnpm dev",
-    "beforeBuildCommand": "pnpm build",
+    "beforeDevCommand": "pnpm --filter @gadget-inspector/client run dev",
+    "beforeBuildCommand": "pnpm --filter @gadget-inspector/client run build",
     "devPath": "http://localhost:1420",
-    "distDir": "../dist",
+    "distDir": "../../frontend/client/dist",
     "withGlobalTauri": false
   },
   "package": {
